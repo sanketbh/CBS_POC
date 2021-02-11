@@ -62,7 +62,7 @@ public class UserTest {
 		newBooking.setBookingFromDate(LocalDateTime.now());
 		newBooking.setBookingToDate(LocalDateTime.now());
 		
-		when(userRepository.findByUserId(u.getUserId())).thenReturn(user);
+		when(userRepository.findByUserId(1)).thenReturn(user);
 		
 		when(carRepository.findByCarId(c.getCarId())).thenReturn(car);
 		

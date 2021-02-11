@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.cbs.entity.Booking;
 import com.cbs.entity.Car;
@@ -42,106 +43,101 @@ public class BookingTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-//	@Test
-//	public void getAllUsersBooking() {
-//		User u = new User();
-//		u.setName("sanket");
-//		u.setEmail("sanket@gmail.com");
-//
-//		Optional<User> user = Optional.of(u);
-//		Car c = new Car();
-//		c.setModel("Hyundai Elentra");
-//		c.setInsuranceTill(LocalDateTime.now());
-//
-//		Optional<Car> car = Optional.of(c);
-//
-//		Booking booking = new Booking();
-//		booking.setBookingFromDate(LocalDateTime.now());
-//		booking.setBookingToDate(LocalDateTime.now());
-//
-//		List<Booking> bookings = new ArrayList<>();
-//		booking.setUser(u);
-//		booking.setCar(c);
-//		bookings.add(booking);
-//		when(userRepository.findByEmail(user.get().getEmail())).thenReturn(user);
-//
-//		when(bookingRepository.findAllUserBooking(u, booking.getBookingFromDate(), booking.getBookingFromDate()))
-//				.thenReturn(bookings);
-//
-//		List<Booking> bookings1 = new ArrayList<>();
-//		bookings1 = bookingService.getAllUsersBooking(u.getEmail(), booking.getBookingFromDate(),
-//				booking.getBookingToDate());
-//
-//		assertEquals(bookings, bookings1);
-//	}
-//
-//	@Test
-//	public void getAllCarBooking() {
-//		User u = new User();
-//		u.setName("sanket");
-//		u.setEmail("sanket@gmail.com");
-//
-//		Optional<User> user = Optional.of(u);
-//
-//		Car c = new Car();
-//		c.setModel("Hyundai Elentra");
-//		c.setInsuranceTill(LocalDateTime.now());
-//
-//		Optional<Car> car = Optional.of(c);
-//		Booking booking = new Booking();
-//		booking.setBookingFromDate(LocalDateTime.now());
-//		booking.setBookingToDate(LocalDateTime.now());
-//
-//		List<Booking> bookings = new ArrayList<>();
-//		booking.setUser(u);
-//		booking.setCar(c);
-//		bookings.add(booking);
-//
-//		when(carRepository.findById(car.get().getCarId())).thenReturn(car);
-//
-//		when(bookingRepository.findAllCarBooking(c, booking.getBookingFromDate(), booking.getBookingToDate()))
-//				.thenReturn(bookings);
-//
-//		List<Booking> bookings1 = new ArrayList<>();
-//		bookings1 = bookingService.getAllCarBooking(c.getCarId(), booking.getBookingFromDate(),
-//				booking.getBookingToDate());
-//		assertEquals(bookings, bookings1);
-//	}
-
-//	// car with valid insurance
-//	@Test
-//	public void getAllCarWithValidInsurance() {
-//		Car c = new Car();
-//		c.setModel("Hyundai Elentra");
-//		c.setInsuranceTill(LocalDateTime.now());
-//
-//		List<Car> cars = new ArrayList<>();
-//		cars.add(c);
-//
-//		when(carRepository.findAllCarWithValidInsurance(c.getInsuranceTill(), c.getInsuranceTill())).thenReturn(cars);
-//
-//		List<Car> cars_check = new ArrayList<>();
-//		cars_check = bookingService.getAllCarWithValidInsurance(c.getInsuranceTill());
-//		assertEquals(cars, cars_check);
-//	}
-
-	// checking for Exception with wrong user_id.
 	@Test
-	public void UserNotFoundException() throws NotFoundException{
-		User user = new User();
-		user.setName("sanket");
-		user.setEmail("sanket@gmail.com");
+	public void getAllUsersBooking() {
+		int pageNumber = 0;
+		int itemsPerPage = 5;
 
-		Optional<User> u = Optional.of(user);
-		
-		when(userRepository.findByUserId(0)).thenReturn(u);
-		
-		Assertions.assertThrows(NotFoundException.class, () -> {
-			userRepository.findByUserId(0).orElseThrow(() -> new NotFoundException("Not found"));
-		});
-		Assertions.assertThrows(NotFoundException.class, () -> {
-		    Integer.parseInt("1");
-		  });
+		User u = new User();
+		u.setName("sanket");
+		u.setEmail("sanket@gmail.com");
+
+		Optional<User> user = Optional.of(u);
+		Car c = new Car();
+		c.setModel("Hyundai Elentra");
+		c.setInsuranceTill(LocalDateTime.now());
+
+		Optional<Car> car = Optional.of(c);
+
+		Booking booking = new Booking();
+		booking.setBookingFromDate(LocalDateTime.now());
+		booking.setBookingToDate(LocalDateTime.now());
+
+		List<Booking> bookings = new ArrayList<>();
+		booking.setUser(u);
+		booking.setCar(c);
+		bookings.add(booking);
+		when(userRepository.findByEmail(user.get().getEmail())).thenReturn(user);
+
+		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+
+		when(bookingRepository.findAllUserBooking(u, booking.getBookingFromDate(), booking.getBookingToDate(),
+				pageable)).thenReturn(bookings);
+
+		List<Booking> bookings1 = new ArrayList<>();
+		bookings1 = bookingService.getAllUsersBooking(u.getEmail(), booking.getBookingFromDate(),
+				booking.getBookingToDate(), pageNumber, itemsPerPage);
+
+		assertEquals(bookings, bookings1);
+	}
+
+	@Test
+	public void getAllCarBooking() {
+		int pageNumber = 0;
+		int itemsPerPage = 5;
+
+		User u = new User();
+		u.setName("sanket");
+		u.setEmail("sanket@gmail.com");
+
+		Optional<User> user = Optional.of(u);
+
+		Car c = new Car();
+		c.setModel("Hyundai Elentra");
+		c.setInsuranceTill(LocalDateTime.now());
+
+		Optional<Car> car = Optional.of(c);
+		Booking booking = new Booking();
+		booking.setBookingFromDate(LocalDateTime.now());
+		booking.setBookingToDate(LocalDateTime.now());
+
+		List<Booking> bookings = new ArrayList<>();
+		booking.setUser(u);
+		booking.setCar(c);
+		bookings.add(booking);
+
+		when(carRepository.findById(car.get().getCarId())).thenReturn(car);
+
+		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+
+		when(bookingRepository.findAllCarBooking(c, booking.getBookingFromDate(), booking.getBookingToDate(), pageable))
+				.thenReturn(bookings);
+
+		List<Booking> bookings1 = new ArrayList<>();
+		bookings1 = bookingService.getAllCarBooking(c.getCarId(), booking.getBookingFromDate(),
+				booking.getBookingToDate(), pageNumber, itemsPerPage);
+		assertEquals(bookings, bookings1);
+	}
+
+	@Test
+	public void getAllCarWithValidInsurance() {
+		int pageNumber = 0;
+		int itemsPerPage = 5;
+
+		Car c = new Car();
+		c.setModel("Hyundai Elentra");
+		c.setInsuranceTill(LocalDateTime.now());
+
+		List<Car> cars = new ArrayList<>();
+		cars.add(c);
+
+		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+
+		when(carRepository.findAllCarWithValidInsurance(c.getInsuranceTill(), pageable)).thenReturn(cars);
+
+		List<Car> cars_check = new ArrayList<>();
+		cars_check = bookingService.getAllCarWithValidInsurance(c.getInsuranceTill(), pageNumber, itemsPerPage);
+		assertEquals(cars, cars_check);
 	}
 
 }
