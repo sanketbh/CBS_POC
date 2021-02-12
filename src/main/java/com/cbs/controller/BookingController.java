@@ -8,9 +8,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cbs.entity.Booking;
 import com.cbs.service.IBookingService;
 
 @RestController
@@ -20,7 +24,7 @@ public class BookingController {
 	private IBookingService bookingService;
 
 	// get all users booking in given time
-	@GetMapping("/bookings/users")
+	@GetMapping("/users/bookings")
 	public ResponseEntity<Map<String, Object>> getAllUsersBooking(@RequestParam String email,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime bookingFromDate,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime bookingToDate,
@@ -32,7 +36,7 @@ public class BookingController {
 	}
 
 	// get all card booking in given time
-	@GetMapping("/bookings/cars")
+	@GetMapping("/cars/bookings")
 	public ResponseEntity<Map<String, Object>> getAllCarsBooking(@RequestParam int id,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime bookingFromDate,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime bookingToDate,
@@ -42,14 +46,15 @@ public class BookingController {
 				.body(bookingService.getAllCarBooking(id, bookingFromDate, bookingToDate, pageNumber, itemsPerPage));
 	}
 
-	// get all cars which has valid insurance in given specified time
-	@GetMapping("/cars/validinsurances")
-	public ResponseEntity<Map<String, Object>> getAllCarWithValidInsurance(
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime insuranceTill,
-			@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "5") int itemsPerPage) {
-
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(bookingService.getAllCarWithValidInsurance(insuranceTill, pageNumber, itemsPerPage));
+	// new booking
+	@PostMapping(value = "/bookings")
+	public ResponseEntity<Booking> addNewBooking(@RequestBody Booking newBooking) {
+		return ResponseEntity.status(HttpStatus.OK).body(bookingService.addNewBooking(newBooking));
 	}
-	
+
+	@PutMapping(value = "/bookings")
+	public ResponseEntity<Booking> updateBooking(@RequestParam int bookingId, @RequestBody Booking booking) {
+		return ResponseEntity.status(HttpStatus.OK).body(bookingService.updateBooking(bookingId, booking));
+	}
+
 }
