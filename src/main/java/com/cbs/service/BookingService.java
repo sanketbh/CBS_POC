@@ -1,9 +1,12 @@
 package com.cbs.service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,31 +40,53 @@ public class BookingService implements IBookingService {
 
 	// get All users booking for specified date(duration)
 	@Override
-	public List<Booking> getAllUsersBooking(String email, LocalDateTime bookingFromDate, LocalDateTime bookingToDate,
+	public Map<String, Object> getAllUsersBooking(String email, LocalDateTime bookingFromDate, LocalDateTime bookingToDate,
 			int pageNumber, int itemsPerPage) {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException("User with email not Found"));
 
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+		
+		Page<Booking> bookings = bookingRepository.findAllUserBooking(user, bookingFromDate, bookingToDate, pageable);
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("bookings", bookings.getContent());
+		response.put("currentPage", bookings.getNumber());
+		response.put("totalItems", bookings.getTotalElements());
+		response.put("totalPages", bookings.getTotalPages());
 
-		return bookingRepository.findAllUserBooking(user, bookingFromDate, bookingToDate, pageable);
+		return response;
 	}
 
 	// get all car which are booked
 	@Override
-	public List<Booking> getAllCarBooking(int id, LocalDateTime bookingFromDate, LocalDateTime bookingToDate,
+	public Map<String, Object> getAllCarBooking(int id, LocalDateTime bookingFromDate, LocalDateTime bookingToDate,
 			int pageNumber, int itemsPerPage) {
 		Car car = carRepository.findById(id).orElseThrow(() -> new NotFoundException("Car not Found"));
 
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+		Page<Booking> bookings = bookingRepository.findAllCarBooking(car, bookingFromDate, bookingToDate, pageable);
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("bookings", bookings.getContent());
+		response.put("currentPage", bookings.getNumber());
+		response.put("totalItems", bookings.getTotalElements());
+		response.put("totalPages", bookings.getTotalPages());
 
-		return bookingRepository.findAllCarBooking(car, bookingFromDate, bookingToDate, pageable);
+		return response;
 	}
 
 	// get all car with valid insurance
 	@Override
-	public List<Car> getAllCarWithValidInsurance(LocalDateTime insuranceTill, int pageNumber, int itemsPerPage) {
+	public Map<String, Object> getAllCarWithValidInsurance(LocalDateTime insuranceTill, int pageNumber, int itemsPerPage) {
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
-		return carRepository.findAllCarWithValidInsurance(insuranceTill, pageable);
+		
+		Page<Car> cars = carRepository.findAllCarWithValidInsurance(insuranceTill, pageable);
+		Map<String, Object> response = new HashMap<>();
+		response.put("cars", cars.getContent());
+		response.put("currentPage", cars.getNumber());
+		response.put("totalItems", cars.getTotalElements());
+		response.put("totalPages", cars.getTotalPages());
+		return response;
 	}
 }

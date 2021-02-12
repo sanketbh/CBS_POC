@@ -17,12 +17,12 @@ import com.cbs.entity.User;
 public interface BookingRepository extends PagingAndSortingRepository<Booking, Integer> {
 
 	@Query("SELECT b FROM Booking b WHERE b.user =:user and b.bookingFromDate >=:bookingFromDate and b.bookingToDate <=:bookingToDate")
-	public List<Booking> findAllUserBooking(@Param("user") User user,
+	public Page<Booking> findAllUserBooking(@Param("user") User user,
 			@Param("bookingFromDate") LocalDateTime bookingFromDate,
 			@Param("bookingToDate") LocalDateTime bookingToDate, Pageable pageable);
 
 	@Query("SELECT b FROM Booking b WHERE b.car =:car and b.bookingFromDate >=:bookingFromDate and b.bookingToDate <=:bookingToDate")
-	public List<Booking> findAllCarBooking(@Param("car") Car car,
+	public Page<Booking> findAllCarBooking(@Param("car") Car car,
 			@Param("bookingFromDate") LocalDateTime bookingFromDate,
 			@Param("bookingToDate") LocalDateTime bookingToDate, Pageable pageable);
 

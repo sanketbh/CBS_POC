@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,13 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import com.cbs.entity.Booking;
 import com.cbs.entity.Car;
 import com.cbs.entity.User;
-import com.cbs.exception.NotFoundException;
 import com.cbs.repository.BookingRepository;
 import com.cbs.repository.CarRepository;
 import com.cbs.repository.UserRepository;
@@ -70,15 +73,22 @@ public class BookingTest {
 		when(userRepository.findByEmail(user.get().getEmail())).thenReturn(user);
 
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+		
+		Page<Booking> bookingsPage = new PageImpl<Booking>(bookings, pageable, bookings.size());
 
+		Map<String, Object> response = new HashMap<>();
+		response.put("bookings", bookingsPage.getContent());
+		response.put("currentPage", bookingsPage.getNumber());
+		response.put("totalItems", bookingsPage.getTotalElements());
+		response.put("totalPages", bookingsPage.getTotalPages());
+		
 		when(bookingRepository.findAllUserBooking(u, booking.getBookingFromDate(), booking.getBookingToDate(),
-				pageable)).thenReturn(bookings);
+				pageable)).thenReturn(bookingsPage);
 
-		List<Booking> bookings1 = new ArrayList<>();
-		bookings1 = bookingService.getAllUsersBooking(u.getEmail(), booking.getBookingFromDate(),
+		Map<String, Object> bookingPage1 =  bookingService.getAllUsersBooking(u.getEmail(), booking.getBookingFromDate(),
 				booking.getBookingToDate(), pageNumber, itemsPerPage);
 
-		assertEquals(bookings, bookings1);
+     	assertEquals(bookingsPage.getContent(), bookingPage1.get("bookings"));
 	}
 
 	@Test
@@ -110,13 +120,20 @@ public class BookingTest {
 
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
 
-		when(bookingRepository.findAllCarBooking(c, booking.getBookingFromDate(), booking.getBookingToDate(), pageable))
-				.thenReturn(bookings);
+		Page<Booking> bookingsPage = new PageImpl<Booking>(bookings, pageable, bookings.size());
 
-		List<Booking> bookings1 = new ArrayList<>();
-		bookings1 = bookingService.getAllCarBooking(c.getCarId(), booking.getBookingFromDate(),
+		Map<String, Object> response = new HashMap<>();
+		response.put("bookings", bookingsPage.getContent());
+		response.put("currentPage", bookingsPage.getNumber());
+		response.put("totalItems", bookingsPage.getTotalElements());
+		response.put("totalPages", bookingsPage.getTotalPages());
+		
+		when(bookingRepository.findAllCarBooking(c, booking.getBookingFromDate(), booking.getBookingToDate(), pageable))
+				.thenReturn(bookingsPage);
+
+		Map<String, Object> bookings1 = bookingService.getAllCarBooking(c.getCarId(), booking.getBookingFromDate(),
 				booking.getBookingToDate(), pageNumber, itemsPerPage);
-		assertEquals(bookings, bookings1);
+		assertEquals(bookingsPage.getContent(), bookings1.get("bookings"));
 	}
 
 	@Test
@@ -133,11 +150,17 @@ public class BookingTest {
 
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
 
-		when(carRepository.findAllCarWithValidInsurance(c.getInsuranceTill(), pageable)).thenReturn(cars);
+		Page<Car> carsPage = new PageImpl<Car>(cars, pageable, cars.size());
 
-		List<Car> cars_check = new ArrayList<>();
-		cars_check = bookingService.getAllCarWithValidInsurance(c.getInsuranceTill(), pageNumber, itemsPerPage);
-		assertEquals(cars, cars_check);
+		Map<String, Object> response = new HashMap<>();
+		response.put("cars", carsPage.getContent());
+		response.put("currentPage", carsPage.getNumber());
+		response.put("totalItems", carsPage.getTotalElements());
+		response.put("totalPages", carsPage.getTotalPages());
+		when(carRepository.findAllCarWithValidInsurance(c.getInsuranceTill(), pageable)).thenReturn(carsPage);
+
+		Map<String, Object> cars_check = bookingService.getAllCarWithValidInsurance(c.getInsuranceTill(), pageNumber, itemsPerPage);
+		assertEquals(carsPage.getContent(), cars_check.get("cars"));
 	}
 
 }

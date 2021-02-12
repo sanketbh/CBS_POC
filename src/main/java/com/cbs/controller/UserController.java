@@ -18,12 +18,12 @@ public class UserController {
 	private IUserService userService;
 
 	// new booking
-	@PostMapping(value = "/users/bookings")
+	@PostMapping(value = "/bookings")
 	public ResponseEntity<Booking> addNewBooking(@RequestBody Booking newBooking) {
 		return ResponseEntity.status(HttpStatus.OK).body(userService.addNewBooking(newBooking));
 	}
 
-	@PutMapping(value = "/users/bookings")
+	@PutMapping(value = "/bookings")
 	public ResponseEntity<Booking> updateBooking(@RequestParam int bookingId, @RequestBody Booking booking) {
 		return ResponseEntity.status(HttpStatus.OK).body(userService.updateBooking(bookingId, booking));
 	}
