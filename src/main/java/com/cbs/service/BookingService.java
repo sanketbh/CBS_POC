@@ -2,7 +2,6 @@ package com.cbs.service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,24 +30,17 @@ public class BookingService implements IBookingService {
 	@Autowired
 	private CarRepository carRepository;
 
-	// new car booking
-	@Override
-	public Booking addNewBooking(Booking booking) {
-		booking = bookingRepository.save(booking);
-		return booking;
-	}
-
 	// get All users booking for specified date(duration)
 	@Override
-	public Map<String, Object> getAllUsersBooking(String email, LocalDateTime bookingFromDate, LocalDateTime bookingToDate,
-			int pageNumber, int itemsPerPage) {
+	public Map<String, Object> getAllUsersBooking(String email, LocalDateTime bookingFromDate,
+			LocalDateTime bookingToDate, int pageNumber, int itemsPerPage) {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException("User with email not Found"));
 
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
-		
+
 		Page<Booking> bookings = bookingRepository.findAllUserBooking(user, bookingFromDate, bookingToDate, pageable);
-		
+
 		Map<String, Object> response = new HashMap<>();
 		response.put("bookings", bookings.getContent());
 		response.put("currentPage", bookings.getNumber());
@@ -66,7 +58,7 @@ public class BookingService implements IBookingService {
 
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
 		Page<Booking> bookings = bookingRepository.findAllCarBooking(car, bookingFromDate, bookingToDate, pageable);
-		
+
 		Map<String, Object> response = new HashMap<>();
 		response.put("bookings", bookings.getContent());
 		response.put("currentPage", bookings.getNumber());
@@ -78,9 +70,10 @@ public class BookingService implements IBookingService {
 
 	// get all car with valid insurance
 	@Override
-	public Map<String, Object> getAllCarWithValidInsurance(LocalDateTime insuranceTill, int pageNumber, int itemsPerPage) {
+	public Map<String, Object> getAllCarWithValidInsurance(LocalDateTime insuranceTill, int pageNumber,
+			int itemsPerPage) {
 		Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
-		
+
 		Page<Car> cars = carRepository.findAllCarWithValidInsurance(insuranceTill, pageable);
 		Map<String, Object> response = new HashMap<>();
 		response.put("cars", cars.getContent());
@@ -88,5 +81,34 @@ public class BookingService implements IBookingService {
 		response.put("totalItems", cars.getTotalElements());
 		response.put("totalPages", cars.getTotalPages());
 		return response;
+	}
+
+	// new car booking
+	@Override
+	public Booking addNewBooking(Booking newBooking) {
+		User user = userRepository.findByUserId(newBooking.getUser().getUserId())
+				.orElseThrow(() -> new NotFoundException("User not Found"));
+
+		Car car = carRepository.findByCarId(newBooking.getCar().getCarId())
+				.orElseThrow(() -> new NotFoundException("Car not Found"));
+
+		newBooking.setUser(user);
+		newBooking.setCar(car);
+		newBooking.setBookingFromDate(newBooking.getBookingFromDate());
+		newBooking.setBookingFromDate(newBooking.getBookingToDate());
+		newBooking = bookingRepository.save(newBooking);
+		return newBooking;
+	}
+
+	@Override
+	public Booking updateBooking(int bookingId, Booking booking) {
+		booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("Booking Not Found"));
+
+		Car car = carRepository.findByCarId(booking.getCar().getCarId())
+				.orElseThrow(() -> new NotFoundException("Car not found"));
+
+		booking.setCar(car);
+		booking = bookingRepository.save(booking);
+		return booking;
 	}
 }

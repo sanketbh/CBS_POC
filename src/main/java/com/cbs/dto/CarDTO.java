@@ -1,24 +1,12 @@
 package com.cbs.dto;
 
-import java.time.Instant;
+
 import java.time.LocalDateTime;
 
-
 public class CarDTO {
-	
-	private String model;
-	private LocalDateTime insurance_till;
-	
-	public CarDTO() {
-		super();
-	}
-	
-	public CarDTO(String model, LocalDateTime insurance_till) {
-		super();
-		this.model = model;
-		this.insurance_till = insurance_till;
-	}
 
+	private String model;
+	private LocalDateTime insuranceTill;
 
 	public String getModel() {
 		return model;
@@ -28,17 +16,17 @@ public class CarDTO {
 		this.model = model;
 	}
 
-	public LocalDateTime getInsurance_till() {
-		return insurance_till;
+	public LocalDateTime getInsuranceTill() {
+		return insuranceTill;
 	}
 
-	public void setInsurance_till(LocalDateTime insurance_till) {
-		this.insurance_till = insurance_till;
+	public void setInsuranceTill(LocalDateTime insuranceTill) {
+		this.insuranceTill = insuranceTill;
 	}
 
 	@Override
 	public String toString() {
-		return "Car [ model=" + model + ", insurance_till=" + insurance_till + "]";
+		return "CarDTO [model=" + model + ", insuranceTill=" + insuranceTill + "]";
 	}
-	
+
 }
